@@ -4,7 +4,8 @@ Macro Analysis:
 Objective: Calculate GDP nowcast, calculate likeliest forward path, project returns based on economic data
 inputs: FRED data, historical prices
 outputs: nowcast, forecast, return correlations
-todo: functionalize fit to include normalization, rolling sum            
+todo: functionalize fit to include normalization, rolling sum, gold model, look at SAAR points, try 
+       
 
 """
 
@@ -24,8 +25,8 @@ sns.set()
 #pull giant historical list of data from Fred
 start = dt.datetime(1980, 1, 1)
 end = dt.date.today()
-macro_data = pdr.get_data_fred(['USAGDPDEFQISMEI','NA000334Q','ND000334Q','GDPC1','CPIAUCSL','PCEC96','PCECC96','RSAFS','RRSFS','DSPIC96','RSAOMV','PSAVERT','PAYEMS','PRSCQ','B4701C0A222NBEA','CES0500000017','ICSA','CCSA','UMCSENT',
-                                'MICH','CSCICP03USM665S','M1','M2','INDPRO','DGORDER','NEWORDER','BUSINV','TLNRESCONS','TLRESCONS','DCOILWTICO','NETEXP','IMPGSC1','EXPGSC1','BOPGSTB',
+macro_data = pdr.get_data_fred(['USAGDPDEFQISMEI','NA000334Q','ND000334Q','GDPC1','CPIAUCSL','PCEC96','PCECC96','RSAFS','RRSFS','DSPIC96','RSAOMV','PSAVERT','PAYEMS','PRSCQ','CES0500000017','ICSA','CCSA','UMCSENT',
+                                'MICH','CSCICP03USM665S','M1','M2','INDPRO','DGORDER','NEWORDER','BUSINV','TLNRESCONS','TLRESCONS','NETEXP','IMPGSC1','EXPGSC1','BOPGSTB',
                                 'DPCERD3Q086SBEA','CPILFESL','DCOILWTICO'], start, end)
 
 ############### Begin Analysis ###############
@@ -40,7 +41,7 @@ series_name= {}
 points_required = {}
 
 #list of tickers to include for outright model
-regression_list = ['PCEC96', 'PCECC96','RSAFS','RRSFS','RSAOMV','PRSCQ']
+regression_list = ['PCEC96', 'PCECC96','RSAFS','RRSFS','RSAOMV','PRSCQ','CES0500000017','INDPRO','DGORDER','NEWORDER','BUSINV','TLNRESCONS','TLRESCONS','NETEXP','IMPGSC1','EXPGSC1','BOPGSTB']
 #for ticker in regression_list:
 #    divisor[ticker] = 1
 
@@ -57,6 +58,17 @@ series_name['RRSFS'] = 'Advance Retail Sales: Real (Monthly)'
 series_name['DSPIC96'] = 'Real Disposable Personal Income (Monthly)'
 series_name['RSAOMV'] = 'Motor Vehicle Sales (Monthly)'
 series_name['PRSCQ'] = 'Hours Worked, Nonfarm (Quarterly)'
+series_name['CES0500000017'] = 'Aggregate Weekly Payrolls (Monthly)'
+series_name['INDPRO'] = 'Industrial Production (Monthly)'
+series_name['DGORDER'] = 'Durable Goods Orders (Monthly) [needs deflator]'
+series_name['NEWORDER'] = 'Nondefense Capital Goods Orders (Monthly) [needs deflator]'
+series_name['BUSINV'] = 'Business Inventories (Monthly) [needs deflator]'
+series_name['TLNRESCONS'] = 'Nonresidential Construction SAAR (Monthly) [needs deflator]'
+series_name['TLRESCONS'] = 'Residential Construction SAAR (Monthly) [needs deflator]'
+series_name['NETEXP'] = 'Net Exports [SAAR, Quarterly]'
+series_name['IMPGSC1'] = 'Real Imports [SAAR, Quarterly]'
+series_name['EXPGSC1'] = 'Real Exports [SAAR, Quarterly]'
+series_name['BOPGSTB'] = 'Trade Balance [SAAR, Quarterly]'
 
 points_required['PCEC96'] = 12
 points_required['PCECC96'] = 4
@@ -64,6 +76,15 @@ points_required['RSAFS'] = 12
 points_required['RRSFS'] = 12
 points_required['RSAOMV'] = 12
 points_required['PRSCQ'] = 4
+points_required['INDPRO'] = 12
+points_required['DGORDER'] = 12
+points_required['NEWORDER'] = 12
+points_required['BUSINV'] = 12
+points_required['TLRESCONS'] = 1
+points_required['NETEXP'] = 1
+points_required['IMPGSC1'] = 1
+points_required['EXPGSC1'] = 1
+points_required['BOPGSTB'] = 12
 
 #initialize dictionaries of regression models and data used
 gdp_model = {}
@@ -82,7 +103,7 @@ for ticker in regression_list:
     gdp_regression = sm.OLS(prediction_data[ticker].loc[:,'realGDP'], prediction_data[ticker].loc[:,ticker])
     gdp_model[ticker] = gdp_regression.fit()
     print(series_name[ticker] + ' r-squared value: ' + '{:.3%}'.format(gdp_model[ticker].rsquared))
-
+''
 def macro_table():
     return macro_data
 
