@@ -23,11 +23,9 @@ gdp_chg_plot = gdp_data[1].diff(periods=3)
 heatmap_data = macroAnalysis.macro_heatmap()
 
 app.layout = html.Div(children=[
-    html.H1(children='Macro Framework 0.00'),
+   
 
-    html.Div(children='''
-        Odin: Reading the runes of macro data.
-    '''),
+   
 
     html.Div(id='gdp-graph-block', 
     style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '20px'},
@@ -42,7 +40,8 @@ app.layout = html.Div(children=[
             'layout': {
                 'title': 'Real GDP in 2015 Dollars',
                 'paper_bgcolor' : 'rgba(0,0,0,0)',
-                'plot_bgcolor' : 'rgba(0,0,0,0)'
+                'plot_bgcolor' : 'rgba(0,0,0,0)',
+                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
             }
         }
     )),
@@ -59,13 +58,14 @@ app.layout = html.Div(children=[
             'layout': {
                 'title': 'Real GDP Change',
                 'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)'
+                'paper_bgcolor' : 'rgba(0,0,0,0)',
+                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
             }
         }
     )),
     
     html.Div(id='gdp-heatmap-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '550px' , 'left' : '50%'},
+    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '500px' , 'left' : '0%'},
     children=
     dcc.Graph(
         id='input-heatmap',
@@ -84,14 +84,15 @@ app.layout = html.Div(children=[
             'layout': {
                 'title': 'GDP Input Heatmap ',
                 'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)'
+                'paper_bgcolor' : 'rgba(0,0,0,0)',
+                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
             }
         }
     )),  
     
     
     html.Div(id='gdp-scatter-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '550px' , 'left' : '0%'},
+    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '500px' , 'left' : '50%'},
     children=
     dcc.Graph(
         id='gdp-scatter-graph',
@@ -102,7 +103,8 @@ app.layout = html.Div(children=[
             'layout': {
                 'title': 'Real GDP Change vs. ',
                 'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)'
+                'paper_bgcolor' : 'rgba(0,0,0,0)',
+                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
             }
         }
     ))
