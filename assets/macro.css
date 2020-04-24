@@ -1,0 +1,20 @@
+@charset "utf-8";
+/* CSS Document */
+
+@import url('https://fonts.googleapis.com/css?family=Exo');
+@import url('https://fonts.googleapis.com/css?family=Jura');
+@import url('https://fonts.googleapis.com/css?family=Eczar');
+/* CSS Document */
+
+html {
+	  background-color: black;
+	 /* color list: blue, aquamarine, purple */
+	  background-repeat: no-repeat;
+	  background-size: 100% 100%;
+	  height:100%;
+	  width:100%;} 
+
+gdp-graph-block {
+	 border-radius: 15px;
+	 font-family: Eczar, Arial, Verdana, sans-serif;
+	 width:50%;}

@@ -4,7 +4,7 @@ Macro Analysis:
 Objective: Calculate GDP nowcast, calculate likeliest forward path, project returns based on economic data
 inputs: FRED data, historical prices
 outputs: nowcast, forecast, return correlations
-todo: functionalize fit to include normalization, rolling sum, gold model, look at SAAR points, try 
+todo: functionalize fit to include normalization, rolling sum, gold model, bitcoin model, look at SAAR points, try z-score for heatmap
        
 
 """
@@ -109,6 +109,13 @@ def macro_table():
 
 def gdp_history():
     return gdp_data,gdp_data_t12m
+
+def scatter_data_gdp():
+    return regression_list, comp_data, prediction_data, series_name, points_required, gdp_model
+
+def macro_heatmap():
+    return (pd.merge_asof(left=gdp_data_t12m, right=macro_data.loc[:,regression_list], left_index=True, right_index=True, direction='backward').pct_change()).transpose()
+
 
 # fig = px.scatter(x=prediction_data.loc[:,ticker].values, y=prediction_data.loc[:,'GDPC1'].values)
 # plot(fig)
