@@ -3,6 +3,8 @@
 Created on Wed Apr 22 10:10:22 2020
 
 @author: freel
+
+todo: create spread analysis page, create vol analysis page
 """
 
 import dash
@@ -21,33 +23,45 @@ gdp_data = macroAnalysis.gdp_history()
 gdp_plot = gdp_data[1]
 gdp_chg_plot = gdp_data[1].diff(periods=3)
 heatmap_data = macroAnalysis.macro_heatmap()
+prediction_results = macroAnalysis.prediction_outputs()
 
-app.layout = html.Div(children=[
+app.layout = html.Div(
+    id='main-chart-block',
+    style={'backgroundColor' : 'red'},
+    children=[
    
-
-   
-
     html.Div(id='gdp-graph-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '20px'},
+    style={'position' : 'absolute',
+           'left' : '1%', 
+           'width': '48%', 
+           'height': '500px', 
+           'top' : '20px'},
     children=
     dcc.Graph(
         id='main-gdp-graph',
         figure={
             'data': [
-                {'x': gdp_plot.index, 'y': gdp_plot.values, 'type': 'bar', 'name': 'GDP'},
-                {'x': gdp_chg_plot.index, 'y': gdp_chg_plot.values, 'type': 'bar', 'name': 'GDP YoY'},
+                {'x': gdp_plot.index,
+                 'y': gdp_plot.values,
+                 'marker' : {'color': gdp_plot.pct_change(), 
+                             'colorscale': 'Viridis',
+                             'opacity': '0.8'},
+                 'type': 'bar',
+                 'name': 'GDP'}
+                
             ],
             'layout': {
                 'title': 'Real GDP in 2015 Dollars',
-                'paper_bgcolor' : 'rgba(0,0,0,0)',
-                'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
             }
         }
     )),
     
     html.Div(id='gdp-chg-graph-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '20px' , 'left' : '50%'},
+    style={'position' : 'absolute', 'width': '48%', 'height': '500px', 'top' : '20px' , 'left' : '51%'},
     children=
     dcc.Graph(
         id='gdp-chg-graph',
@@ -57,15 +71,16 @@ app.layout = html.Div(children=[
             ],
             'layout': {
                 'title': 'Real GDP Change',
-                'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)',
-                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
             }
         }
     )),
     
     html.Div(id='gdp-heatmap-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '500px' , 'left' : '0%'},
+    style={'position' : 'absolute', 'width': '48%', 'left' : '1%', 'height': '500px', 'top' : '500px'},
     children=
     dcc.Graph(
         id='input-heatmap',
@@ -83,16 +98,17 @@ app.layout = html.Div(children=[
             ],
             'layout': {
                 'title': 'GDP Input Heatmap ',
-                'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)',
-                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
             }
         }
     )),  
     
     
     html.Div(id='gdp-scatter-block', 
-    style={'position' : 'absolute', 'width': '50%', 'height': '500px', 'top' : '500px' , 'left' : '50%'},
+    style={'position' : 'absolute', 'width': '48%', 'height': '500px', 'top' : '500px' , 'left' : '51%'},
     children=
     dcc.Graph(
         id='gdp-scatter-graph',
@@ -102,14 +118,35 @@ app.layout = html.Div(children=[
             ],
             'layout': {
                 'title': 'Real GDP Change vs. ',
-                'plot_bgcolor' : 'rgba(0,0,0,0)',
-                'paper_bgcolor' : 'rgba(0,0,0,0)',
-                'margin' : {'l': '20', 'r' : '20', 't' : '20', 'b' : '20' }
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
             }
         }
-    ))
+    )),
     
-    
+    html.Div(id='prediction-bar-block', 
+    style={'position' : 'absolute', 'width': '48%', 'height': '500px', 'top' : '1000px' , 'left' : '1%'},
+    children=
+    dcc.Graph(
+        id='prediction-bar-graph',
+        figure={
+            'data': [
+                {'x': prediction_results.index,
+                 'y': prediction_results.iloc[:,0].values.tolist(),
+                 'type': 'bar', 
+                 'name': 'Predicted GDP'},
+            ],
+            'layout': {
+                'title': 'Real GDP Change vs. ',
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
+            }
+        }
+    )) 
 
     
 ])
