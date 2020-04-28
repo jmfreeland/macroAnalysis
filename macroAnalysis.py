@@ -12,17 +12,15 @@ todo: functionalize fit to include normalization, rolling sum, gold model, bitco
 
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import pandas_datareader as pdr
 import datetime as dt
 from dateutil.relativedelta import *
-import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import plotly.express as px
 from plotly.offline import plot
 
 #initializations
-sns.set()
+
 
 #pull giant historical list of data from Fred
 start = dt.datetime(1970, 1, 1)
@@ -80,13 +78,13 @@ points_required['RSAOMV'] = 1
 points_required['PRSCQ'] = 1
 points_required['INDPRO'] = 1
 points_required['DGORDER'] = 1
-points_required['NEWORDER'] = 12
-points_required['BUSINV'] = 12
+points_required['NEWORDER'] = 1
+points_required['BUSINV'] = 1
 points_required['TLRESCONS'] = 1
 points_required['NETEXP'] = 1
 points_required['IMPGSC1'] = 1
 points_required['EXPGSC1'] = 1
-points_required['BOPGSTB'] = 12
+points_required['BOPGSTB'] = 1
 
 #initialize dictionaries of regression models and data used
 gdp_model = {}
@@ -135,6 +133,7 @@ def macro_heatmap():
 def prediction_outputs():
     predictions = pd.DataFrame(predicted_value)
     predictions['Average'] = predictions.transpose().mean()
+    predictions['Last Report'] = gdp_data_t12m[-1]
     return predictions.transpose().sort_values(by=0), last_report_date
 
 

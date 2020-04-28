@@ -13,6 +13,8 @@ import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
+import plotly.graph_objects as go
+import datetime as dt
 
 
 import macroAnalysis
@@ -28,6 +30,40 @@ gdp_plot = gdp_data[1]
 gdp_chg_plot = gdp_data[1].diff(periods=3)
 heatmap_data = macroAnalysis.macro_heatmap()
 [prediction_results, last_date] = macroAnalysis.prediction_outputs()
+
+full_data = macroAnalysis.macro_table()
+
+#create time series of predictors    
+input_time_series = go.Figure()    
+input_time_series.update_layout( 
+                {'title': 'Real GDP Change vs. ',
+                'plot_bgcolor' : 'rgba(28,30,33,0.50)',
+                'paper_bgcolor' : 'rgba(28,30,33,0.50)',
+                'font' : {'color' : 'rgba(240,235,216,.9)'},
+                'margin' : {'l': 50, 'r' : 50, 't' : 50, 'b' : 50 }})
+
+for ticker in regression_list:
+   input_time_series.add_trace(go.Scatter(
+                        x=full_data.loc[full_data.index.year>2018,ticker].dropna().index.date, 
+                        y=full_data.loc[full_data.index.year>2018,ticker].dropna().pct_change(),
+                        mode='lines+markers',
+                        name=ticker))
+
+#create average last point line for prediction graph
+# last_gdp_line = go.Figure()
+# last_gdp_line.add_shape(
+#         # Line reference to the axes
+#             type="line",
+#             xref="x",
+#             yref="y",
+#             x0=0,
+#             y0=20000,
+#             x1=15,
+#             y1=20000,
+#             line=dict(
+#                 color="LightSeaGreen",
+#                 width=3,
+#             ))
 
 app.layout = html.Div(
     id='main-chart-block',
@@ -156,10 +192,19 @@ app.layout = html.Div(
                 'margin' : {'l': '50', 'r' : '50', 't' : '50', 'b' : '50' }
             }
         }
-    )) 
+    )),
+        
+    html.Div(id='prediction-line-block', 
+    style={'position' : 'absolute', 'width': '48%', 'height': '500px', 'top' : '1000px' , 'left' : '51%'},
+    children=
+    dcc.Graph(
+        id='prediction-line-graph',
+        figure=(input_time_series)))   
 
-    
 ])
+    
+
+   
 
 if __name__ == '__main__':
     app.run_server(debug=True)
