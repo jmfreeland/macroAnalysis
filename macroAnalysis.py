@@ -6,6 +6,7 @@ inputs: FRED data, historical prices
 outputs: nowcast, forecast, return correlations
 todo: functionalize fit to include normalization, rolling sum, gold model, bitcoin model, look at SAAR points, try z-score for heatmap
         -improve hovertext (), improve heatmap to monthly if possible
+        -PCA for macro ETFs
 
 """
 
@@ -71,14 +72,14 @@ series_name['IMPGSC1'] = 'Real Imports [SAAR, Quarterly]'
 series_name['EXPGSC1'] = 'Real Exports [SAAR, Quarterly]'
 series_name['BOPGSTB'] = 'Trade Balance [SAAR, Quarterly]'
 
-points_required['PCEC96'] = 12
-points_required['PCECC96'] = 4
-points_required['RSAFS'] = 12
-points_required['RRSFS'] = 12
-points_required['RSAOMV'] = 12
-points_required['PRSCQ'] = 4
-points_required['INDPRO'] = 12
-points_required['DGORDER'] = 12
+points_required['PCEC96'] = 1
+points_required['PCECC96'] = 1
+points_required['RSAFS'] = 1
+points_required['RRSFS'] = 11
+points_required['RSAOMV'] = 1
+points_required['PRSCQ'] = 1
+points_required['INDPRO'] = 1
+points_required['DGORDER'] = 1
 points_required['NEWORDER'] = 12
 points_required['BUSINV'] = 12
 points_required['TLRESCONS'] = 1
@@ -94,7 +95,7 @@ comp_data = {}
 prediction_data = {}
 test_point = {}
 predicted_value = {}
-
+last_report_date = {}
 
 gdp_data = macro_data.loc[:,'realGDP'].dropna()
 gdp_data_t12m = gdp_data.rolling(window=4).sum().dropna()
@@ -116,12 +117,8 @@ for ticker in regression_list:
     prediction_data[ticker] = comp_data[ticker][-1]
     test_point[ticker] = prediction_data[ticker].sum()
     predicted_value[ticker] = gdp_model[ticker].predict([test_point[ticker]])
+    last_report_date[ticker] = (comp_data[ticker].index)[-1]
     
-    
-    
-    
-    
-
 
 def macro_table():
     return macro_data
@@ -138,7 +135,7 @@ def macro_heatmap():
 def prediction_outputs():
     predictions = pd.DataFrame(predicted_value)
     predictions['Average'] = predictions.transpose().mean()
-    return predictions.transpose().sort_values(by=0)
+    return predictions.transpose().sort_values(by=0), last_report_date
 
 
 

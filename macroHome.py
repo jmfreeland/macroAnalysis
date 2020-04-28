@@ -8,8 +8,12 @@ todo: create spread analysis page, create vol analysis page
 """
 
 import dash
+import numpy as np
+import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.express as px
+
 
 import macroAnalysis
 
@@ -23,7 +27,7 @@ gdp_data = macroAnalysis.gdp_history()
 gdp_plot = gdp_data[1]
 gdp_chg_plot = gdp_data[1].diff(periods=3)
 heatmap_data = macroAnalysis.macro_heatmap()
-prediction_results = macroAnalysis.prediction_outputs()
+[prediction_results, last_date] = macroAnalysis.prediction_outputs()
 
 app.layout = html.Div(
     id='main-chart-block',
@@ -44,7 +48,7 @@ app.layout = html.Div(
                 {'x': gdp_plot.index,
                  'y': gdp_plot.values,
                  'marker' : {'color': gdp_plot.pct_change(), 
-                             'colorscale': 'Viridis',
+                             'colorscale': 'Greys',
                              'opacity': '0.8'},
                  'type': 'bar',
                  'name': 'GDP'}
@@ -132,12 +136,18 @@ app.layout = html.Div(
     dcc.Graph(
         id='prediction-bar-graph',
         figure={
-            'data': [
-                {'x': prediction_results.index,
+            'data': 
+                [{'x': prediction_results.index,
                  'y': prediction_results.iloc[:,0].values.tolist(),
                  'type': 'bar', 
-                 'name': 'Predicted GDP'},
-            ],
+                 'marker' : {'color': (np.datetime64('today') - pd.Series(list(last_date.values()))).dt.days, 
+                             'colorscale': 'Greys',
+                             'cmin' : 30,
+                             'cmax' : 180,
+                             'showscale' : True,
+                             'reversescale' : True,      
+                             'name': 'Predicted GDP'
+                             }}],
             'layout': {
                 'title': 'Real GDP Change vs. ',
                 'plot_bgcolor' : 'rgba(28,30,33,0.50)',
