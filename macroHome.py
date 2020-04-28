@@ -36,7 +36,7 @@ full_data = macroAnalysis.macro_table()
 #create time series of predictors    
 input_time_series = go.Figure()    
 input_time_series.update_layout( 
-                {'title': 'Real GDP Change vs. ',
+                {'title': 'GDP Model Inputs',
                 'plot_bgcolor' : 'rgba(28,30,33,0.50)',
                 'paper_bgcolor' : 'rgba(28,30,33,0.50)',
                 'font' : {'color' : 'rgba(240,235,216,.9)'},
@@ -85,7 +85,7 @@ app.layout = html.Div(
                  'y': gdp_plot.values,
                  'marker' : {'color': gdp_plot.pct_change(), 
                              'colorscale': 'Greys',
-                             'opacity': '0.8'},
+                             'opacity': '0.85'},
                  'type': 'bar',
                  'name': 'GDP'}
                 
@@ -185,7 +185,7 @@ app.layout = html.Div(
                              'name': 'Predicted GDP'
                              }}],
             'layout': {
-                'title': 'Real GDP Change vs. ',
+                'title': 'GDP Model Results by Input ',
                 'plot_bgcolor' : 'rgba(28,30,33,0.50)',
                 'paper_bgcolor' : 'rgba(28,30,33,0.50)',
                 'font' : {'color' : 'rgba(240,235,216,.9)'},

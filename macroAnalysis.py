@@ -7,6 +7,8 @@ outputs: nowcast, forecast, return correlations
 todo: functionalize fit to include normalization, rolling sum, gold model, bitcoin model, look at SAAR points, try z-score for heatmap
         -improve hovertext (), improve heatmap to monthly if possible
         -PCA for macro ETFs
+        -Adjust everything to real
+        -include some sort of confidence interval
 
 """
 
@@ -46,7 +48,7 @@ regression_list = ['PCEC96', 'PCECC96','RSAFS','RRSFS','RSAOMV','PRSCQ','CES0500
 #    divisor[ticker] = 1
 
 for ticker in regression_list:
-    points_required[ticker] = 4
+    points_required[ticker] = 1
     
 for ticker in regression_list:
     series_name[ticker] = ticker
@@ -73,7 +75,7 @@ series_name['BOPGSTB'] = 'Trade Balance [SAAR, Quarterly]'
 points_required['PCEC96'] = 1
 points_required['PCECC96'] = 1
 points_required['RSAFS'] = 1
-points_required['RRSFS'] = 11
+points_required['RRSFS'] = 1
 points_required['RSAOMV'] = 1
 points_required['PRSCQ'] = 1
 points_required['INDPRO'] = 1
@@ -102,19 +104,19 @@ next_release = gdp_data.index[-1] + relativedelta(months=3)
 
 #model gdp for each factor
 for ticker in regression_list:
-    comp_data[ticker] = macro_data.loc[:,ticker].dropna().rolling(window=points_required[ticker]).sum()
+    comp_data[ticker] = macro_data.loc[:,ticker].dropna().rolling(window=points_required[ticker]).mean()
     fit_data[ticker] = pd.merge_asof(left=gdp_data_t12m, right=comp_data[ticker], left_index=True, right_index=True, direction='backward')
     fit_data[ticker] = fit_data[ticker].dropna()
-    fit_data[ticker] = sm.add_constant(fit_data[ticker])
+    #fit_data[ticker] = sm.add_constant(fit_data[ticker])
 
-    gdp_regression = sm.OLS(fit_data[ticker].loc[:,'realGDP'], fit_data[ticker].loc[:,ticker], hasconst=True)
+    gdp_regression = sm.OLS(fit_data[ticker].loc[:,'realGDP'].values, sm.add_constant(fit_data[ticker].loc[:,ticker]).values, hasconst=True)
     gdp_model[ticker] = gdp_regression.fit()
     print(series_name[ticker] + ' r-squared value: ' + '{:.3%}'.format(gdp_model[ticker].rsquared))
     
     #prediction_data[ticker] = (comp_data[ticker].loc[comp_data[ticker].index<=next_release]).iloc[-points_required[ticker]:]
     prediction_data[ticker] = comp_data[ticker][-1]
     test_point[ticker] = prediction_data[ticker].sum()
-    predicted_value[ticker] = gdp_model[ticker].predict([test_point[ticker]])
+    predicted_value[ticker] = gdp_model[ticker].predict([1,test_point[ticker]])
     last_report_date[ticker] = (comp_data[ticker].index)[-1]
     
 
