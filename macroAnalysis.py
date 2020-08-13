@@ -4,11 +4,15 @@ Macro Analysis:
 Objective: Calculate GDP nowcast, calculate likeliest forward path, project returns based on economic data
 inputs: FRED data, historical prices
 outputs: nowcast, forecast, return correlations
-todo: functionalize fit to include normalization, rolling sum, gold model, bitcoin model, look at SAAR points, try z-score for heatmap
+todo: functionalize fit to include normalization, rolling sum, gold model!, bitcoin model, look at SAAR points, try z-score for heatmap
         -improve hovertext (), improve heatmap to monthly if possible
         -PCA for macro ETFs
         -Adjust everything to real
         -include some sort of confidence interval
+        -commitment of traders via quandl
+        -opacity -> rSquare
+        -autocorrelation and hurst exponent
+        -survey around credit tightening
 
 """
 
@@ -33,9 +37,10 @@ macro_data = pdr.get_data_fred(['USAGDPDEFQISMEI','NA000334Q','ND000334Q','GDPC1
 
 ############### Begin Analysis ###############
 #convert nominal quarterly data to real using implicit deflator, calculate a trailing four quarter average
-macro_data.loc[:,'realGDP'] = .1*(macro_data.loc[:,'NA000334Q']/macro_data.loc[:,'USAGDPDEFQISMEI'])
+#macro_data.loc[:,'realGDP'] = .1*(macro_data.loc[:,'NA000334Q']/macro_data.loc[:,'USAGDPDEFQISMEI'])
+macro_data.loc[:,'realGDP'] = macro_data.loc[:,'GDPC1']
 gdp_data = macro_data.loc[:,'realGDP'].dropna()
-gdp_data_trailing = gdp_data.rolling(window=4).sum()
+#gdp_data_trailing = gdp_data.rolling(window=4).sum()
 
 #initialize series long name dictionary and dictionary of how many data points are required to annualize
 #divisor = {} 
@@ -98,7 +103,9 @@ predicted_value = {}
 last_report_date = {}
 
 gdp_data = macro_data.loc[:,'realGDP'].dropna()
-gdp_data_t12m = gdp_data.rolling(window=4).sum().dropna()
+#clean this up
+gdp_data_t12m = gdp_data
+#gdp_data_t12m = gdp_data.rolling(window=4).sum().dropna()
 
 next_release = gdp_data.index[-1] + relativedelta(months=3)
 
